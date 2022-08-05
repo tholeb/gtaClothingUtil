@@ -1,30 +1,17 @@
-import sys
 import os
 import argparse
 from glob import glob
 from shutil import copy
 
+from shared.functions import *
+
 parser = argparse.ArgumentParser(
     description='''Change the starting number of an addon cloth. \033[31mYou must do it type by type (jbib, accs, etc.).\033[0m''',
-    epilog="""Written by tholeb <tholeb.fr>. Not responsible for any damage caused by this program :)""")
+    epilog="""Written by tholeb <tholeb.fr>""")
 parser.add_argument('acc', type=int, default=1, help='The number to accumulate to the texture name. Default to 1')
 parser.add_argument('--input', type=str, default='./input', help='The input folder. Default to "./input"')
 parser.add_argument('--output', type=str, default='./output', help='The input folder. Default to "./output"')
 args = parser.parse_args()
-
-
-def is_a_texture(name):
-    """ 
-    Check if it's a texture by counting the number of parts for the model
-    :param name: the name of the model
-    :return: True if it's a texture, False otherwise
-    """
-    length = len(name.split('_'))
-
-    if length > 3:
-        return True
-    else:
-        return False
 
 
 # Get all .ydd and .ytd files in the input folder
