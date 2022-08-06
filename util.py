@@ -1,5 +1,6 @@
 from glob import glob
 import argparse
+from operator import length_hint
 import os
 from shutil import copy
 
@@ -15,31 +16,50 @@ args = parser.parse_args()
 # Get all .ydd and .ytd files in the input folder
 input = glob(f'{args.input}/*.ydd') + glob(f'{args.input}/*.ytd')
 
-[os.makedirs(f'{args.output}/{group}', exist_ok=True) for i, group in enumerate(["accs", "berd", "decl", "feet", "hair", "hand", "head", "jbib", "lowr", "task", "teef", "uppr" ])]
+components = ["accs", "berd", "decl", "feet", "hair", "hand", "head", "jbib", "lowr", "task", "teef", "uppr"]
+props = ["ears", "eyes", "head", "hip", "lfoot", "lhand", "lwrist", "mouth", "rfoot", "rhand", "rwrist", "unk604819740", "unk2358626934"]
+
 
 # Loop on every models
 for i, path in enumerate([f for f in input if f.endswith('.ydd')]):
     # Get file name
     file = path.split('/')[-1]
 
+    a, b = 1, 2
+
     # Get the clothing component
-    outfit = file.split('^')[1]
+    ped, outfit = file.split('^')[0], file.split('^')[1]
 
-    # Get the model group (jbib, accs, etc.)
-    group = outfit.split('_')[0]
+    # Get the model type and number
+    type, number = outfit.split('_')[0], outfit.split('_')[1]
 
-    # Get the number of the texture and make it an integer
-    number = outfit.split('_')[1]
+    # Create components folders
+    components_dir = f"{args.output}/{ped}/components"
+    [os.makedirs(f"{components_dir}/{component}", exist_ok=True) for component in components]
 
-    folder = f"{args.output}/{group}"
+    # Create props folders
+    props_dir = f"{args.output}/{ped}_p/props"
+    [os.makedirs(f"{props_dir}/{prop}", exist_ok=True) for prop in props]
 
-    os.makedirs(f"{folder}/{i}", exist_ok=True)
-    copy(path, f"{folder}/{i}.ydd")
+    dir = ""
 
-    textures = [t for t in input if f"{group}_diff_{number}" in t]
+    if type in components:
+        dir = components_dir
+    elif type in props:
+        dir = props_dir
+    else:
+        print(f"\033[41m{path} is neither a component ({', '.join(components)}) nor a prop ({', '.join(props)}) -- IGNORED\033[0m")
+        continue
 
-    [copy(v, f"{folder}/{i}/{k}.ytd") for k, v in enumerate(textures)]
+    num = len(glob(f"{dir}/{type}/*.ydd"))
+
+    os.makedirs(f"{dir}/{type}/{num}", exist_ok=True)
+    copy(path, f"{dir}/{type}/{num}.ydd")
+
+    textures = [t for t in input if f"{type}_diff_{number}" in t]
+
+    [copy(v, f"{dir}/{type}/{num}/{k}.ytd") for k, v in enumerate(textures)]
 
     # Print all the info
-    print(f"\033[35m#{i}\033[0m \033[96m{path}\033[0m --> \033[32m{folder}/{i}.ydd\033[0m\n\
-            Textures --> \033[34m{folder}/{i}/*.ytd\033[0m \033[33m({len(textures)})\033[0m \n")
+    print(f"\033[35m#{num}\033[0m \033[96m{path}\033[0m --> \033[32m{dir}/{type}/{num}.ydd\033[0m\n\
+            Textures --> \033[34m{dir}/{type}/{num}/*.ytd\033[0m \033[33m({len(textures)})\033[0m \n")
