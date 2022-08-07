@@ -1,6 +1,6 @@
 from glob import glob
 import argparse
-from os import makedirs
+from os import makedirs, remove
 from platform import system
 from shutil import copy
 
@@ -12,6 +12,7 @@ p = argparse.ArgumentParser(
 p.add_argument('-i', '--input', type=str, default='./input', help='The input folder. Default to "./input"')
 p.add_argument('-o', '--output', type=str, default='./output', help='The input folder. Default to "./output"')
 p.add_argument('--dlc', action='store_true', help='Attempt to get rid of DLC name from a ped (e.g. mp_f_freemode_01_mp_f_bikerdlc_01 to mp_f_freemode_01)')
+p.add_argument('-D', '--delete', action='store_true', help='Delete the input content.')
 args = p.parse_args()
 
 # Get all .ydd and .ytd files in the input folder
@@ -31,7 +32,7 @@ for i, path in enumerate([f for f in input if f.endswith('.ydd')]):
         file = path.split('\\')[-1]
 
     # Get the clothing component and outfit name
-    ped, outfit = file.split('^')[0], file.split('^')[1]
+    ped, outfit = file.split('^')[0], file.split('^')[1].split('.')[0]
 
     # Ignore non valid items (not a prop or component)
     if outfit.split('_')[0] not in components and outfit.split('_')[1] not in props:
@@ -77,6 +78,7 @@ for i, path in enumerate([f for f in input if f.endswith('.ydd')]):
 
     # Get all the textures for a matching model
     textures = [t for t in input if f"{type}_diff_{number}" in t]
+    print(type, number, f"{type}_diff_{number}", textures)
 
     # And copy them to the appropriate folder
     [copy(v, f"{dir}/{type}/{num}/{k}.ytd") for k, v in enumerate(textures)]
@@ -85,3 +87,7 @@ for i, path in enumerate([f for f in input if f.endswith('.ydd')]):
     print(f"\033[35m#{i}\033[0m \033[96m{path}\033[0m --> \033[32m{dir}/{type}/{num}.ydd\033[0m\n\
             Textures --> \033[34m{dir}/{type}/{num}/*.ytd\033[0m \033[33m({len(textures)})\033[0m \n\
             Ped --> \033[34m{ped}\033[0m")
+
+if args.delete:
+    for f in input:
+        remove(f)
