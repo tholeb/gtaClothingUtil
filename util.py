@@ -78,7 +78,6 @@ for i, path in enumerate([f for f in input if f.endswith('.ydd')]):
 
     # Get all the textures for a matching model
     textures = [t for t in input if f"{type}_diff_{number}" in t]
-    print(type, number, f"{type}_diff_{number}", textures)
 
     # And copy them to the appropriate folder
     [copy(v, f"{dir}/{type}/{num}/{k}.ytd") for k, v in enumerate(textures)]
