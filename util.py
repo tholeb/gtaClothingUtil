@@ -71,10 +71,12 @@ for i, path in enumerate([f for f in input if f.endswith('.ydd')]):
 
     # The folder's number (each component/prop need to have a single number for each type. e.g 0.ydd)
     num = len(glob(f"{dir}/{type}/*.ydd"))
+
+    # search for a patten in the acc option
     if search('^(.*=[0-9]*;?)$', args.acc):
         incr = [a for a in args.acc.split(';') if type in a]
 
-        # No matching amount
+        # The current type has a matching amount, so we increment the value
         if len(incr) == 1:
             num += int(incr[0].split('=')[1])
 
