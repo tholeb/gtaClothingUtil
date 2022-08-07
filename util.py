@@ -3,7 +3,7 @@ import argparse
 from os import makedirs, remove
 from platform import system
 from shutil import copy
-
+from re import search
 from shared.functions import *
 
 p = argparse.ArgumentParser(
@@ -12,6 +12,7 @@ p = argparse.ArgumentParser(
 p.add_argument('-i', '--input', type=str, default='./input', help='The input folder. Default to "./input"')
 p.add_argument('-o', '--output', type=str, default='./output', help='The input folder. Default to "./output"')
 p.add_argument('--dlc', action='store_true', help='Attempt to get rid of DLC name from a ped (e.g. mp_f_freemode_01_mp_f_bikerdlc_01 to mp_f_freemode_01)')
+p.add_argument('-A', '--acc', type=str, default='', help='Make the prop/component start at a defined value. e.g. "jbib=20;accs=30;lwrist=25" for multiple value make shure to quote the argument.')
 p.add_argument('-D', '--delete', action='store_true', help='Delete the input content.')
 args = p.parse_args()
 
@@ -24,7 +25,6 @@ props = ["ears", "eyes", "head", "hip", "lfoot", "lhand", "lwrist", "mouth", "rf
 
 # Loop on every models
 for i, path in enumerate([f for f in input if f.endswith('.ydd')]):
-
     # Get file name
     if system() == "Linux":
         file = path.split('/')[-1]
@@ -71,6 +71,12 @@ for i, path in enumerate([f for f in input if f.endswith('.ydd')]):
 
     # The folder's number (each component/prop need to have a single number for each type. e.g 0.ydd)
     num = len(glob(f"{dir}/{type}/*.ydd"))
+    if search('^(.*=[0-9]*;?)$', args.acc):
+        incr = [a for a in args.acc.split(';') if type in a]
+
+        # No matching amount
+        if len(incr) == 1:
+            num += int(incr[0].split('=')[1])
 
     # Copy the model to the appropriate folder and create it's textures folder
     makedirs(f"{dir}/{type}/{num}", exist_ok=True)
