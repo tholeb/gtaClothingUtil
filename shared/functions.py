@@ -4,9 +4,24 @@ def is_a_texture(name):
     :param name: the name of the model
     :return: True if it's a texture, False otherwise
     """
-    length = len(name.split('_'))
-
-    if length > 3:
+    if "_diff_" in name:
         return True
-    else:
-        return False
+    return False
+
+
+def is_a_prop(ped):
+    if ped.endswith('_p') or "_p_" in ped:
+        return True
+    return False
+
+
+def clean_ped_name(ped, is_a_prop):
+    if ped.startswith('mp_'):
+        p = ped.split('_')
+
+        if is_a_prop:
+            return '_'.join(p[:5])
+
+        return '_'.join(p[:4])
+
+    return ped
