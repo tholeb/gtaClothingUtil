@@ -25,31 +25,32 @@ for i, path in enumerate([f for f in input if f.endswith('.ydd')]):
     # Get file name
     file = path.split('/')[-1]
 
-    a, b = 1, 2
-
-    # Get the clothing component
+    # Get the clothing component and outfit name
     ped, outfit = file.split('^')[0], file.split('^')[1]
 
-    # Get the model type and number
-    type, number = outfit.split('_')[0], outfit.split('_')[1]
-
-    # Create components folders
-    components_dir = f"{args.output}/{ped}/components"
-    [os.makedirs(f"{components_dir}/{component}", exist_ok=True) for component in components]
-
-    # Create props folders
-    props_dir = f"{args.output}/{ped}_p/props"
-    [os.makedirs(f"{props_dir}/{prop}", exist_ok=True) for prop in props]
-
-    dir = ""
-
-    if type in components:
-        dir = components_dir
-    elif type in props:
-        dir = props_dir
-    else:
+    # Ignore non valid items (not a prop or component)
+    if outfit.split('_')[0] not in components and outfit.split('_')[1] not in props:
         print(f"\033[41m{path} is neither a component ({', '.join(components)}) nor a prop ({', '.join(props)}) -- IGNORED\033[0m")
         continue
+
+    # Create components/props folders
+    ped_dir = f"{args.output}/{ped}"
+    if ped.endswith('_p'):
+        # It's a Prop
+
+        # Get the model type and number
+        type, number = outfit.split('_')[1], outfit.split('_')[2]
+
+        dir = f"{ped_dir}/props"
+        [os.makedirs(f"{dir}/{prop}", exist_ok=True) for prop in props]
+    else:
+        # It's a Component
+
+        # Get the model type and number
+        type, number = outfit.split('_')[0], outfit.split('_')[1]
+
+        dir = f"{ped_dir}/components"
+        [os.makedirs(f"{dir}/{component}", exist_ok=True) for component in components]
 
     num = len(glob(f"{dir}/{type}/*.ydd"))
 
