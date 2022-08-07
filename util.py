@@ -1,7 +1,7 @@
 from glob import glob
 import argparse
-from operator import length_hint
-import os
+from os import makedirs
+from platform import system
 from shutil import copy
 
 from shared.functions import *
@@ -22,8 +22,12 @@ props = ["ears", "eyes", "head", "hip", "lfoot", "lhand", "lwrist", "mouth", "rf
 
 # Loop on every models
 for i, path in enumerate([f for f in input if f.endswith('.ydd')]):
+
     # Get file name
-    file = path.split('/')[-1]
+    if system() == "Linux":
+        file = path.split('/')[-1]
+    else:
+        file = path.split('\\')[-1]
 
     # Get the clothing component and outfit name
     ped, outfit = file.split('^')[0], file.split('^')[1]
@@ -42,7 +46,7 @@ for i, path in enumerate([f for f in input if f.endswith('.ydd')]):
         type, number = outfit.split('_')[1], outfit.split('_')[2]
 
         dir = f"{ped_dir}/props"
-        [os.makedirs(f"{dir}/{prop}", exist_ok=True) for prop in props]
+        [makedirs(f"{dir}/{prop}", exist_ok=True) for prop in props]
     else:
         # It's a Component
 
@@ -50,11 +54,11 @@ for i, path in enumerate([f for f in input if f.endswith('.ydd')]):
         type, number = outfit.split('_')[0], outfit.split('_')[1]
 
         dir = f"{ped_dir}/components"
-        [os.makedirs(f"{dir}/{component}", exist_ok=True) for component in components]
+        [makedirs(f"{dir}/{component}", exist_ok=True) for component in components]
 
     num = len(glob(f"{dir}/{type}/*.ydd"))
 
-    os.makedirs(f"{dir}/{type}/{num}", exist_ok=True)
+    makedirs(f"{dir}/{type}/{num}", exist_ok=True)
     copy(path, f"{dir}/{type}/{num}.ydd")
 
     textures = [t for t in input if f"{type}_diff_{number}" in t]
@@ -62,5 +66,5 @@ for i, path in enumerate([f for f in input if f.endswith('.ydd')]):
     [copy(v, f"{dir}/{type}/{num}/{k}.ytd") for k, v in enumerate(textures)]
 
     # Print all the info
-    print(f"\033[35m#{num}\033[0m \033[96m{path}\033[0m --> \033[32m{dir}/{type}/{num}.ydd\033[0m\n\
+    print(f"\033[35m#{i}\033[0m \033[96m{path}\033[0m --> \033[32m{dir}/{type}/{num}.ydd\033[0m\n\
             Textures --> \033[34m{dir}/{type}/{num}/*.ytd\033[0m \033[33m({len(textures)})\033[0m \n")
