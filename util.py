@@ -36,10 +36,12 @@ for i, path in enumerate([f for f in input if f.endswith('.ydd')]):
     group, number = outfit.split('_')[0], outfit.split('_')[1]
 
     ped_dir = f"{args.output}/{ped}"
+    texture_files = f"{ped}^{group}_diff_{number}"
 
     # Change the group and number according to a prop
     if is_a_prop(ped):
         group, number = outfit.split('_')[1], outfit.split('_')[2]
+        texture_files = f"{ped}^p_{group}_diff_{number}"
 
     # Ignore non valid items (not a prop or component)
     if group not in components and group not in props:
@@ -72,7 +74,7 @@ for i, path in enumerate([f for f in input if f.endswith('.ydd')]):
     copy(path, f"{dir}/{group}/{num}.ydd")
 
     # Get all the textures for a matching model
-    textures = [t for t in input if f"{group}_diff_{number}" in t]
+    textures = [t for t in input if texture_files in t]
 
     # And copy them to the appropriate folder
     [copy(v, f"{dir}/{group}/{num}/{k}.ytd") for k, v in enumerate(textures)]
