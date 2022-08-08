@@ -11,13 +11,12 @@ p = argparse.ArgumentParser(
     epilog="Written by tholeb <tholeb.fr>")
 p.add_argument('-i', '--input', type=str, default='./input', metavar="\033[32m./input_folder\033[0m", help='The input folder. Default to "./input"')
 p.add_argument('-o', '--output', type=str, default='./output', metavar="\033[32m./output_folder\033[0m", help='The input folder. Default to "./output"')
-p.add_argument('-A', '--acc', type=str, default='', metavar="\033[32m\"accs=x,jbib=y,...\"\033[0m",
-               help='Add a specific amount to a component/prop group so you can merge multiple clothing packs.')
 p.add_argument('-D', '--delete', action='store_true', help='Delete the input content afterwords.')
 args = p.parse_args()
 
 # Get all .ydd and .ytd files in the input folder
 input = glob(f'{args.input}/*.ydd') + glob(f'{args.input}/*.ytd')
+input.sort()
 
 components = ["accs", "berd", "decl", "feet", "hair", "hand", "head", "jbib", "lowr", "task", "teef", "uppr"]
 props = ["ears", "eyes", "head", "hip", "lfoot", "lhand", "lwrist", "mouth", "rfoot", "rhand", "rwrist", "unk604819740", "unk2358626934"]
@@ -60,14 +59,6 @@ for i, path in enumerate([f for f in input if f.endswith('.ydd')]):
 
     # The folder's number (each component/prop need to have a single number for each group. e.g 0.ydd)
     num = len(glob(f"{dir}/{group}/*.ydd"))
-
-    # search for a patten in the acc option
-    if search('^(.*=[0-9]*,?)$', args.acc):
-        incr = [a for a in args.acc.split(',') if group in a]
-
-        # The current group has a matching amount, so we increment the value
-        if len(incr) == 1:
-            num += int(incr[0].split('=')[1])
 
     # Copy the model to the appropriate folder and create it's textures folder
     makedirs(f"{dir}/{group}/{num}", exist_ok=True)
