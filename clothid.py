@@ -1,3 +1,5 @@
+# Might be deprecated. Left here if someone is interested by this stuff.
+
 import os
 import argparse
 from glob import glob
